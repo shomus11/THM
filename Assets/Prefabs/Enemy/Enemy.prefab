@@ -233,8 +233,9 @@ MonoBehaviour:
   patrolSpeed: 1.5
   chaseSpeed: 3.5
   patrolDirection: {x: 1, y: 0}
+  enemyDirection: 0
   detectionRadius: 5
-  chaseDelay: 2
+  chaseDelay: 1.5
   changeDirectionInterval: 3
   wonderingInterval: 1.5
   enemyAnimator: {fileID: 8522419889370757020}

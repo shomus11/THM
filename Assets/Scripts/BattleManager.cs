@@ -15,18 +15,16 @@ public class BattleManager : MonoBehaviour
     public GameObject BattleSystemObject;
     public List<GameObject> playerParty;
     public List<GameObject> enemyParty;
-
     public PlayerController playerController;
     public EnemyController enemyController;
-
-    [SerializeField] Character characterTurn;
 
     [Header("CharacterData")]
     public List<Character> playerPartyData;
     public List<Character> enemyPartyData;
     [SerializeField] List<Character> allCombatants = new List<Character>();
 
-    [Header("CharacterTurn")]
+    [Header("Character Turn component")]
+    [SerializeField] Character characterTurn;
     public TextMeshProUGUI playerTurnText;
     public Queue<Character> turnQueue;
     public GameObject characterActionPanel;
@@ -47,6 +45,8 @@ public class BattleManager : MonoBehaviour
 
 
     [Header("on Battle Select Target")]
+    [SerializeField] List<GameObject> activePlayerParty;
+    [SerializeField] List<GameObject> activeEnemyParty;
     [SerializeField] bool onBattleSelectTarget = false;
     [SerializeField] int partySelected = 0;
     [SerializeField] int enemypartySelected = 0;
@@ -57,16 +57,17 @@ public class BattleManager : MonoBehaviour
     [SerializeField] int gameoverSelected = 0;
     [SerializeField] bool gameover;
 
-
-
     [Header("Ekstra")]
     [SerializeField] Canvas actionCanvas;
     [SerializeField] Transform targetIndicator;
+    [SerializeField] Canvas hudCanvas;
+    [SerializeField] TextMeshProUGUI dealtText;
     //[SerializeField] int enemyDefeated = 0;
     //[SerializeField] int partyDefeated = 0;
     [SerializeField] bool canInput = true;
     public List<GameObject> skillPrefabs;
     public string bgmTarget;
+
 
 
     private void Awake()
@@ -80,6 +81,7 @@ public class BattleManager : MonoBehaviour
         actionMax = actionButton.Count;
         InitButtonListener();
         BattleSystemObject.gameObject.SetActive(false);
+        hudCanvas.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -152,11 +154,13 @@ public class BattleManager : MonoBehaviour
 
         //partyDefeated = 0;
         //enemyDefeated = 0;
+        hudCanvas.gameObject.SetActive(false);
         playerController = player;
         enemyController = enemy;
         playerPartyData = playerController.playerParty;
         enemyPartyData = enemyController.enemyParty;
         SetPartySpeed(playerAttacked, ambush);
+        SetEnemyPartySpeed();
         SetBattleCharacter();
         InitializeTurnQueue();
         BattleSystemObject.gameObject.SetActive(true);
@@ -202,6 +206,8 @@ public class BattleManager : MonoBehaviour
 
     public void SetBattleCharacter()
     {
+        activePlayerParty = new List<GameObject>();
+        activeEnemyParty = new List<GameObject>();
         // deactive first
         foreach (var obj in playerParty) obj.SetActive(false);
         foreach (var obj in enemyParty) obj.SetActive(false);
@@ -212,6 +218,8 @@ public class BattleManager : MonoBehaviour
             {
                 playerParty[i].SetActive(true);
                 playerParty[i].GetComponentInChildren<SpriteRenderer>().sprite = playerPartyData[i].CharacterBaseBattleSprite;
+                Debug.Log("add player");
+                activePlayerParty.Add(playerParty[i]);
             }
         }
 
@@ -221,6 +229,8 @@ public class BattleManager : MonoBehaviour
             {
                 enemyParty[i].SetActive(true);
                 enemyParty[i].GetComponentInChildren<SpriteRenderer>().sprite = enemyPartyData[i].CharacterBaseBattleSprite;
+                Debug.Log("add enemy");
+                activeEnemyParty.Add(enemyParty[i]);
             }
         }
 
@@ -345,9 +355,21 @@ public class BattleManager : MonoBehaviour
     private void RemoveCharacter(Character character)
     {
         if (playerPartyData.Contains(character))
+        {
+            int index = playerPartyData.IndexOf(character);
+            activePlayerParty[index].gameObject.SetActive(false);
+            activePlayerParty.Remove(activePlayerParty[index]);
             playerPartyData.Remove(character);
+        }
+
         else if (enemyPartyData.Contains(character))
+        {
+            int index = enemyPartyData.IndexOf(character);
+            activeEnemyParty[index].gameObject.SetActive(false);
+            activeEnemyParty.Remove(activeEnemyParty[index]);
             enemyPartyData.Remove(character);
+        }
+
 
         Debug.Log($"{character.CharacterName} has been removed from battle.");
     }
@@ -355,21 +377,21 @@ public class BattleManager : MonoBehaviour
     {
         int enemyDefeated = 0;
         int partyDefeated = 0;
-        for (int i = 0; i < enemyPartyData.Count; i++)
-        {
-            if (enemyPartyData[i].CurrentHealth <= 0)
-            {
-                enemyDefeated++;
-            }
-        }
+        //for (int i = 0; i < enemyPartyData.Count; i++)
+        //{
+        //    if (enemyPartyData[i].CurrentHealth <= 0)
+        //    {
+        //        enemyDefeated++;
+        //    }
+        //}
 
-        for (int i = 0; i < playerPartyData.Count; i++)
-        {
-            if (playerPartyData[i].CurrentHealth <= 0)
-            {
-                partyDefeated++;
-            }
-        }
+        //for (int i = 0; i < playerPartyData.Count; i++)
+        //{
+        //    if (playerPartyData[i].CurrentHealth <= 0)
+        //    {
+        //        partyDefeated++;
+        //    }
+        //}
 
         if (enemyDefeated >= enemyPartyData.Count)
         {
@@ -398,6 +420,7 @@ public class BattleManager : MonoBehaviour
 
     void BackToExplore()
     {
+        UITransition.instance.FadeOutFadeIn();
         GameplayManager.instance.gameState = GameState.exploring;
         GameplayManager.instance.PlayExploringBGM();
         enemyController.gameObject.SetActive(false);
@@ -456,12 +479,12 @@ public class BattleManager : MonoBehaviour
         if (playerPartyData.Contains(target))
         {
             index = playerPartyData.IndexOf(target);
-            go = Instantiate(damageEffect, playerParty[index].transform.position, Quaternion.identity);
+            go = Instantiate(damageEffect, activePlayerParty[index].transform.position, Quaternion.identity);
         }
         else
         {
             index = enemyPartyData.IndexOf(target);
-            go = Instantiate(damageEffect, enemyParty[index].transform.position, Quaternion.identity);
+            go = Instantiate(damageEffect, activeEnemyParty[index].transform.position, Quaternion.identity);
         }
         go.SetActive(true);
 
@@ -493,14 +516,19 @@ public class BattleManager : MonoBehaviour
         }
 
         target.CurrentHealth -= damage;
+        string massage = $"{attacker.CharacterName} attacked {target.CharacterName} for {damage} damage! and now health were {target.CurrentHealth}";
+        Debug.Log(massage);
 
-        Debug.Log($"{attacker.CharacterName} attacked {target.CharacterName} for {damage} damage! and now health were {target.CurrentHealth}");
-
+        hudCanvas.gameObject.SetActive(true);
+        dealtText.text = massage;
         if (target.CurrentHealth <= 0)
         {
             Debug.Log($"{target.CharacterName} has been defeated!");
-            //RemoveCharacter(target);
+            RemoveCharacter(target);
         }
+
+        yield return new WaitForSeconds(1f);
+        hudCanvas.gameObject.SetActive(false);
         CheckParty();
         go.SetActive(false);
         Destroy(go);
@@ -823,9 +851,9 @@ public class BattleManager : MonoBehaviour
             targetIndicator.gameObject.SetActive(true);
 
             if (playerPartyData.Contains(characterTurn))
-                targetIndicator.transform.position = enemyParty[enemypartySelected].transform.position + Vector3.up;
+                targetIndicator.transform.position = activeEnemyParty[enemypartySelected].transform.position + Vector3.up;
             else
-                targetIndicator.transform.position = playerParty[partySelected].transform.position + Vector3.up;
+                targetIndicator.transform.position = activePlayerParty[partySelected].transform.position + Vector3.up;
         }
         else
         {
@@ -845,9 +873,9 @@ public class BattleManager : MonoBehaviour
     public void SelectingCharacter()
     {
         if (playerPartyData.Contains(characterTurn))
-            targetIndicator.transform.position = enemyParty[enemypartySelected].transform.position + Vector3.up;
+            targetIndicator.transform.position = activeEnemyParty[enemypartySelected].transform.position + Vector3.up;
         else
-            targetIndicator.transform.position = playerParty[partySelected].transform.position + Vector3.up;
+            targetIndicator.transform.position = activePlayerParty[partySelected].transform.position + Vector3.up;
     }
 
     public void SelectButton(List<Button> targetButton, int targetSelected)
