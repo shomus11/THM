@@ -10,8 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a6c11d1d1d61bd445ab88cb1499f1096, type: 3}
-  m_Name: FireBall
+  m_Name: Fire Ball
   m_EditorClassIdentifier: 
   skillName: Fire Ball
   damage: 10
   manaCost: 10
+  isHeal: 0
+  skillPrefab: {fileID: 3246808767262001282, guid: 343a0e9bbb4738045968b3ca312586b7, type: 3}

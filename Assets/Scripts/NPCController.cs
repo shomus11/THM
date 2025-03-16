@@ -4,11 +4,13 @@ using UnityEngine;
 public class NPCController : MonoBehaviour, IInteractable
 {
     Interactor interactor;
-    float waitTime = 1f;
+    [SerializeField] float waitTime = 1f;
+    public Canvas characterDialog;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        characterDialog.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -35,7 +37,9 @@ public class NPCController : MonoBehaviour, IInteractable
 
     public IEnumerator StartInteract()
     {
-        yield return new WaitForSeconds(.5f);
+        characterDialog.gameObject.SetActive(true);
+        yield return new WaitForSeconds(waitTime);
+        characterDialog.gameObject.SetActive(false);
         OnFinishedInteract();
     }
 }

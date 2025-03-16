@@ -16,3 +16,4 @@ MonoBehaviour:
   damage: 15
   manaCost: 10
   isHeal: 0
+  skillPrefab: {fileID: 7617884124182329708, guid: d087324f34e5b72428b6cf3e579dcce1, type: 3}

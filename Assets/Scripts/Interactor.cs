@@ -9,7 +9,7 @@ public class Interactor : MonoBehaviour
     [SerializeField] GameObject interactionIndicator;
     [SerializeField] PlayerController player;
     Collider2D[] colliders = new Collider2D[3];
-    bool canInteract = false;
+
     IInteractable targetedInteractObject;
 
     public bool OnInteraction { get => onInteraction; set => onInteraction = value; }
@@ -42,7 +42,7 @@ public class Interactor : MonoBehaviour
             targetedInteractObject = colliders[0].GetComponent<IInteractable>();
             if (targetedInteractObject != null)
             {
-                canInteract = true;
+                player.CanInteract = true;
                 if (!OnInteraction)
                     ShowInteractionIndicator(true);
 
@@ -55,12 +55,12 @@ public class Interactor : MonoBehaviour
             ShowInteractionIndicator(false);
             OnInteraction = false;
             targetedInteractObject = null;
-            canInteract = false;
+            player.CanInteract = false;
         }
     }
     public void InteractInput(InputAction.CallbackContext context)
     {
-        if (canInteract)
+        if (player.CanInteract)
             if (targetedInteractObject != null)
                 Interact(targetedInteractObject);
     }
@@ -70,7 +70,7 @@ public class Interactor : MonoBehaviour
         ShowInteractionIndicator(false);
         player.CanMove = false;
         OnInteraction = true;
-        canInteract = false;
+        player.CanInteract = false;
 
     }
 
@@ -79,7 +79,7 @@ public class Interactor : MonoBehaviour
         ShowInteractionIndicator(true);
         player.CanMove = true;
         OnInteraction = false;
-        canInteract = true;
+        player.CanInteract = true;
     }
 
     public void ShowInteractionIndicator(bool set)

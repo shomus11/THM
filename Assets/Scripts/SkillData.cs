@@ -7,4 +7,5 @@ public class SkillData : ScriptableObject
     public int damage;
     public int manaCost;
     public bool isHeal = false;
+    public GameObject skillPrefab;
 }

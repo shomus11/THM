@@ -160,7 +160,7 @@ public class BattleManager : MonoBehaviour
         SetBattleCharacter();
         InitializeTurnQueue();
         BattleSystemObject.gameObject.SetActive(true);
-        StartTurn();
+        StartCoroutine(InitTurn());
     }
 
     void SetPartySpeed(bool playerAttacked = false, bool ambush = false)
@@ -250,7 +250,11 @@ public class BattleManager : MonoBehaviour
             turnQueue.Enqueue(character);
         }
     }
-
+    IEnumerator InitTurn()
+    {
+        yield return new WaitForSeconds(1f);
+        StartTurn();
+    }
     private void StartTurn()
     {
         if (GameplayManager.instance.gameState == GameState.battle)
@@ -292,6 +296,7 @@ public class BattleManager : MonoBehaviour
 
     private void EnemyTurn(Character enemy)
     {
+        HideUI(false);
         characterTurn = enemy;
         Debug.Log($"Enemy {enemy.CharacterName} attacks!");
         characterActionPanel.gameObject.SetActive(false);
@@ -417,28 +422,34 @@ public class BattleManager : MonoBehaviour
     {
         GameObject damageEffect;
         GameObject go;
+        int skillNum = 0;
         int index = 0;
         canInput = false;
         HideUI(false);
 
         // check if skill attack or not for spawn Animation Object
-        if (skillattack)
-        {
-            if (playerPartyData.Contains(target))
-            {
-                damageEffect = skillPrefabs.FirstOrDefault(obj => obj.name == attacker.Skills[skillSelected].skillName);
-            }
-            else
-            {
-                damageEffect = skillPrefabs.FirstOrDefault(obj => obj.name == attacker.Skills[Random.Range(0, attacker.Skills.Count)].skillName);
-            }
-
-            SoundManager.Instance.PlaySE($"{attacker.Skills[skillSelected].skillName}");
-        }
-        else
+        if (!skillattack)
         {
             damageEffect = skillPrefabs.FirstOrDefault(obj => obj.name == "Attack");
             SoundManager.Instance.PlaySE($"Attack");
+        }
+        else
+        {
+            if (playerPartyData.Contains(attacker))
+            {
+                Debug.Log("player fixed");
+                skillNum = skillSelected;
+
+            }
+            else
+            {
+
+                Debug.Log("enemy random");
+                skillNum = Random.Range(0, attacker.Skills.Count);
+                //damageEffect = attacker.Skills[Random.Range(0, attacker.Skills.Count)].skillPrefab;
+            }
+            damageEffect = attacker.Skills[skillNum].skillPrefab;
+            SoundManager.Instance.PlaySE($"{attacker.Skills[skillNum].skillName}");
         }
 
         // check target if in player or enemy party
@@ -462,8 +473,8 @@ public class BattleManager : MonoBehaviour
         {
             if (skillattack)
             {
-                Debug.Log($"{attacker.Skills[skillSelected]} used ");
-                damage = Mathf.Max(attacker.Skills[skillSelected].damage + attacker.BaseDamage - target.Defend, 1);
+                Debug.Log($"{attacker.Skills[skillNum].skillName} used ");
+                damage = Mathf.Max(attacker.Skills[skillNum].damage + attacker.BaseDamage - target.Defend, 1);
             }
             else
                 damage = Mathf.Max(attacker.BaseDamage - target.Defend, 1);
@@ -474,8 +485,8 @@ public class BattleManager : MonoBehaviour
         {
             if (skillattack)
             {
-                Debug.Log($"{attacker.Skills[skillSelected]} used ");
-                damage = Mathf.Max(attacker.Skills[skillSelected].damage + attacker.BaseDamage, 1);
+                Debug.Log($"{attacker.Skills[skillNum].skillName} used ");
+                damage = Mathf.Max(attacker.Skills[skillNum].damage + attacker.BaseDamage, 1);
             }
             else
                 damage = Mathf.Max(attacker.BaseDamage, 1);
@@ -493,11 +504,11 @@ public class BattleManager : MonoBehaviour
         CheckParty();
         go.SetActive(false);
         Destroy(go);
-        if (!enemyPartyData.Contains(attacker))
-        {
-            HideUI(true);
-            Back();
-        }
+        //if (!enemyPartyData.Contains(attacker))
+        //{
+        //    HideUI(true);
+        //    Back();
+        //}
         //canInput = true;
     }
 

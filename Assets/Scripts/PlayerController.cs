@@ -21,11 +21,12 @@ public class PlayerController : MonoBehaviour
     bool attacking = false;
     public List<CharacterData> party;
     public List<Character> playerParty;
+    bool canInteract = false;
 
     private Vector2 lastValidPosition;
     Vector2 movement;
-
     public bool CanMove { get => canMove; set => canMove = value; }
+    public bool CanInteract { get => canInteract; set => canInteract = value; }
 
     private void Awake()
     {
@@ -163,7 +164,7 @@ public class PlayerController : MonoBehaviour
         if (canMove)
             if (context.started)
             {
-                if (!attacking)
+                if (!attacking && !canInteract)
                     TriggerAttack();
             }
     }
