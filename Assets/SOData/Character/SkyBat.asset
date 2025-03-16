@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01f73cd24f3b30643a607e07639a80e4, type: 3}
+  m_Name: SkyBat
+  m_EditorClassIdentifier: 
+  character:
+    characterName: SkyBat
+    currentHealth: 50
+    maxHealth: 50
+    currentMana: 50
+    maxMana: 50
+    baseDamage: 7
+    defend: 7
+    onDefend: 0
+    currentSpeed: 0
+    speed: 12
+    skills:
+    - {fileID: 11400000, guid: 78062937ae1c29b42b591912238657cd, type: 2}
+    characterBaseBattleSprite: {fileID: 8647823593821616703, guid: dc6dff97e67c9ce40bac9eecd5da45fb, type: 3}
