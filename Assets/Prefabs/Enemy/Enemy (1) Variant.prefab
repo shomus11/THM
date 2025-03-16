@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8098903096057404951, guid: 71a5a7843ef4b544b8deb1fbc341144f, type: 3}
       propertyPath: chaseDelay
-      value: 1.5
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: 8098903096057404951, guid: 71a5a7843ef4b544b8deb1fbc341144f, type: 3}
       propertyPath: patrolSpeed
